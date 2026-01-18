@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { Pool } from "pg";
 import dotenv from "dotenv";
 import path from "path";
@@ -54,12 +54,18 @@ const initDB = async () => {
 };
 initDB();
 
-app.get('/', (req: Request, res: Response) => {
+// logger middleware
+const logger = (req: Request, res: Response, next: NextFunction) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}\n`);
+    next();
+}
+
+app.get('/', logger, (req: Request, res: Response) => {
     res.send('Hello Next Level Developers!')
 });
 
 // Users CRUD
-app.post("/api/v1/users", async (req: Request, res: Response) => {
+app.post("/api/v1/users", logger, async (req: Request, res: Response) => {
     const { name, email, password, phone, role } = req.body;
 
     try {
@@ -79,7 +85,7 @@ app.post("/api/v1/users", async (req: Request, res: Response) => {
     }
 });
 // Users CRUD
-app.get("/api/v1/users", async (req: Request, res: Response) => {
+app.get("/api/v1/users", logger, async (req: Request, res: Response) => {
     try {
         const result = await pool.query(`SELECT * FROM users`);
         res.status(200).json({
@@ -95,7 +101,7 @@ app.get("/api/v1/users", async (req: Request, res: Response) => {
     }
 });
 // Users CRUD
-app.put("/api/v1/users/:id", async (req: Request, res: Response) => {
+app.put("/api/v1/users/:id", logger, async (req: Request, res: Response) => {
     const { name, email, password, phone, role } = req.body;
 
     try {
@@ -124,7 +130,7 @@ app.put("/api/v1/users/:id", async (req: Request, res: Response) => {
     }
 });
 // Users CRUD
-app.delete("/api/v1/users/:id", async (req: Request, res: Response) => {
+app.delete("/api/v1/users/:id", logger, async (req: Request, res: Response) => {
     try {
         const result = await pool.query(`DELETE FROM users WHERE id = $1`, [
             req.params.id
@@ -152,7 +158,7 @@ app.delete("/api/v1/users/:id", async (req: Request, res: Response) => {
 });
 
 // Vehicles CRUD
-app.post("/api/v1/vehicles", async (req: Request, res: Response) => {
+app.post("/api/v1/vehicles", logger, async (req: Request, res: Response) => {
     const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = req.body;
     try {
         const result = await pool.query(`INSERT INTO vehicles(vehicle_name, type, registration_number, daily_rent_price, availability_status) VALUES($1, $2, $3, $4, $5) RETURNING *`, [vehicle_name, type, registration_number, daily_rent_price, availability_status]);
@@ -171,7 +177,7 @@ app.post("/api/v1/vehicles", async (req: Request, res: Response) => {
     }
 });
 // Vehicles CRUD => get all vehicles
-app.get("/api/v1/vehicles", async (req: Request, res: Response) => {
+app.get("/api/v1/vehicles", logger, async (req: Request, res: Response) => {
     try {
         const result = await pool.query(`SELECT * FROM vehicles`);
         res.status(200).json({
@@ -188,7 +194,7 @@ app.get("/api/v1/vehicles", async (req: Request, res: Response) => {
     }
 });
 // Vehicles CRUD => get single vehicle
-app.get("/api/v1/vehicles/:id", async (req: Request, res: Response) => {
+app.get("/api/v1/vehicles/:id", logger, async (req: Request, res: Response) => {
     try {
         const result = await pool.query(`SELECT * FROM vehicles WHERE id = $1`, [
             req.params.id
@@ -215,7 +221,7 @@ app.get("/api/v1/vehicles/:id", async (req: Request, res: Response) => {
     }
 });
 // Vehicles CRUD
-app.put("/api/v1/vehicles/:id", async (req: Request, res: Response) => {
+app.put("/api/v1/vehicles/:id", logger, async (req: Request, res: Response) => {
     const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = req.body;
 
     try {
@@ -243,7 +249,7 @@ app.put("/api/v1/vehicles/:id", async (req: Request, res: Response) => {
     }
 });
 // Vehicles CRUD
-app.delete("/api/v1/vehicles/:id", async (req: Request, res: Response) => {
+app.delete("/api/v1/vehicles/:id", logger, async (req: Request, res: Response) => {
     try {
         const result = await pool.query(`DELETE FROM vehicles WHERE id=$1`, [
             req.params.id
@@ -271,7 +277,7 @@ app.delete("/api/v1/vehicles/:id", async (req: Request, res: Response) => {
 });
 
 // bookings CRUD
-app.post("/api/v1/bookings", async (req: Request, res: Response) => {
+app.post("/api/v1/bookings", logger, async (req: Request, res: Response) => {
     const { customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status } = req.body;
 
     try {
@@ -315,7 +321,7 @@ app.post("/api/v1/bookings", async (req: Request, res: Response) => {
     }
 });
 // bookings CRUD => get all bookings
-app.get("/api/v1/bookings", async (req: Request, res: Response) => {
+app.get("/api/v1/bookings", logger, async (req: Request, res: Response) => {
     try {
         const result = await pool.query(`SELECT * FROM bookings`);
         res.status(200).json({
@@ -332,7 +338,7 @@ app.get("/api/v1/bookings", async (req: Request, res: Response) => {
     }
 });
 // bookings CRUD
-app.put("/api/v1/bookings/:id", async (req: Request, res: Response) => {
+app.put("/api/v1/bookings/:id", logger, async (req: Request, res: Response) => {
     const { customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status } = req.body;
 
     try {
