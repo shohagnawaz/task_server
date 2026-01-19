@@ -22,71 +22,12 @@ app.get('/', logger, (req: Request, res: Response) => {
 // Users CRUD
 app.use("/api/v1/users", logger, userRoutes);
 
-
-
 // Vehicles CRUD
-app.post("/api/v1/vehicles", logger, async (req: Request, res: Response) => {
-    const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = req.body;
-    try {
-        const result = await pool.query(`INSERT INTO vehicles(vehicle_name, type, registration_number, daily_rent_price, availability_status) VALUES($1, $2, $3, $4, $5) RETURNING *`, [vehicle_name, type, registration_number, daily_rent_price, availability_status]);
+app.use("/api/v1/vehicles", logger, )
 
-        res.status(201).json({
-            success: true,
-            message: "Vehicle inserted successfully",
-            data: result.rows[0]
-        })
 
-    } catch (err: any) {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        })
-    }
-});
-// Vehicles CRUD => get all vehicles
-app.get("/api/v1/vehicles", logger, async (req: Request, res: Response) => {
-    try {
-        const result = await pool.query(`SELECT * FROM vehicles`);
-        res.status(200).json({
-            success: true,
-            message: "vehicles fetched successfully",
-            data: result.rows
-        })
 
-    } catch (err: any) {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        })
-    }
-});
-// Vehicles CRUD => get single vehicle
-app.get("/api/v1/vehicles/:id", logger, async (req: Request, res: Response) => {
-    try {
-        const result = await pool.query(`SELECT * FROM vehicles WHERE id = $1`, [
-            req.params.id
-        ]);
 
-        if (result.rows.length === 0) {
-            res.status(404).json({
-                success: false,
-                message: "User not found"
-            })
-        } else {
-            res.status(200).json({
-                success: true,
-                message: "User fetched successfully",
-                data: result.rows[0]
-            })
-        }
-
-    } catch (err: any) {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        })
-    }
-});
 // Vehicles CRUD
 app.put("/api/v1/vehicles/:id", logger, async (req: Request, res: Response) => {
     const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = req.body;
